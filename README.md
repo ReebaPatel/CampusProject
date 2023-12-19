@@ -1,1 +1,1 @@
-# CampusProject
+# Campus Event Managemengt System
