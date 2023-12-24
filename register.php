@@ -1,3 +1,34 @@
+<?php
+$showAlert = false;
+$showError = false;
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    include 'partials/_dbconnect.php';
+    $username = $_POST['username'];
+    $password = $_POST["password"];
+    $cpassword = $_POST["confpassword"];
+
+    $existSql = "SELECT * FROM `users` WHERE username = '$username'";
+    $result = mysqli_query($conn, $existSql);
+    $numExistRows = mysqli_num_rows($result);
+    if ($numExistRows > 0) {
+        $showError = "Username already exists";
+    } else {
+        if ($password == $cpassword) {
+            $hash = password_hash($password , PASSWORD_DEFAULT);
+            $sql = "INSERT INTO `users` ( `Username`, `Password`, `Date`) VALUES ( '$username', '$hash', current_timestamp())";
+            $result = mysqli_query($conn, $sql);
+            if ($result) {
+                $showAlert = true;
+            }
+        } else {
+            $showError = "Passwords do not match";
+        }
+    }
+}
+
+?>
+
 <!doctype html>
 <html lang="en">
 
@@ -10,27 +41,39 @@
 
 <body>
     <?php require 'partials/_nav.php' ?>
-    <div class="container">
+    <?php
+    if ($showAlert) {
+        echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Sucess!</strong> Your account is created and you can Login now.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>';
+    }
+    if ($showError) {
+        echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error!</strong> ' . $showError . '
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>';
+    }
+    ?>
+    <div class="container my-4">
         <h1 class="text-center">Register Yourself :)</h1>
-        <form action ="/MyProject/CampusProject/register.php" method="POST">
+        <form action="/MyProject/CampusProject/register.php" method="POST">
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
-                <input type="email" class="form-control" id="username" name="username" aria-describedby="emailHelp">
+                <input type="text" maxlength="11" class="form-control" id="username" name="username" aria-describedby="emailHelp">
                 
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name = "password">
-                <div id="emailHelp" class="form-text">Kindly enter 8 digit password</div>
+                <input type="password" maxlength="8" class="form-control" id="password" name="password">
+                <div id="emailHelp" class="form-text">Password must be maximum 8 digits</div>
             </div>
             <div class="mb-3">
                 <label for="confpassword" class="form-label">Confirm Password</label>
                 <input type="password" class="form-control" id="confpassword" name="confpassword">
                 <div id="emailHelp" class="form-text">Make sure your password is same</div>
             </div>
-            <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="exampleCheck1">
-             </div>
+
             <button type="submit" class="btn btn-primary">Register</button>
         </form>
 
