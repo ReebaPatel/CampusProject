@@ -1,12 +1,13 @@
 <?php
-$server= "localhost";
+// Database connection for events
+$servername = "localhost";
 $username = "root";
 $password = "";
-$database="events";
+$database = "events";
 
-$conn=mysqli_connect($server,$username,$password,$database);
-if(!$conn){
-   
-    die("Error".mysqli_connect_error());
+$conn_events = mysqli_connect($servername, $username, $password, $database);
+
+if (!$conn_events) {
+    die("Connection failed: " . mysqli_connect_error());
 }
 ?>
